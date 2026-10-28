@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Sanya Templates</title><style>
+:root{color-scheme:light dark;--b:#f5f3fb;--c:#fff;--t:#1c1730;--m:#6b6684;--a:#6a3fd6;--l:#1c173022}
+@media(prefers-color-scheme:dark){:root{--b:#13101f;--c:#1d1930;--t:#efebf9;--m:#9b95b6;--a:#8a63f0;--l:#ffffff1f}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--b);color:var(--t);font:15px/1.5 system-ui,-apple-system,"Noto Sans Thai","Noto Sans",sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+header{position:sticky;top:0;z-index:5;background:var(--b);border-bottom:1px solid var(--l);padding:calc(env(safe-area-inset-top) + 8px) 12px 8px}
+.r{display:flex;gap:8px}
+.s{flex:1;display:flex;align-items:center;gap:8px;background:var(--c);border:1px solid var(--l);border-radius:12px;padding:0 10px}
+.s svg{width:18px;height:18px;flex:none;stroke:var(--m)}
+input,select{font:inherit;color:inherit;border:0;outline:0;min-width:0}
+input{flex:1;height:40px;background:transparent}
+select{background:var(--c);border:1px solid var(--l);border-radius:12px;padding:0 8px;height:40px}
+#c{display:flex;gap:6px;overflow-x:auto;padding-top:8px;scrollbar-width:none}
+#c button{flex:none;border:1px solid var(--l);background:transparent;color:var(--m);border-radius:99px;padding:4px 12px;font:inherit}
+#c button.on{background:var(--a);border-color:var(--a);color:#fff}
+#g{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:12px}
+.k{background:var(--c);border:1px solid var(--l);border-radius:12px;overflow:hidden;cursor:pointer}
+.p{position:relative;aspect-ratio:5/7;overflow:hidden;background:#fff}
+.p iframe{position:absolute;left:0;top:0;width:1000px;height:1400px;border:0;transform-origin:0 0;pointer-events:none}
+.n{display:flex;align-items:center;gap:4px;padding:6px 6px 6px 10px}
+.n b{flex:1;font-weight:600;font-size:13px;line-height:1.3}
+.n button{flex:none;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:var(--m);display:grid;place-items:center}
+.n button.ok{color:var(--a)}
+.n svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#o{position:fixed;inset:0;z-index:9;background:var(--b);display:none}
+#o.on{display:block}
+#f{width:100%;height:100%;border:0;background:#fff}
+#x{position:absolute;top:calc(env(safe-area-inset-top) + 8px);right:8px;width:40px;height:40px;border:0;border-radius:99px;background:var(--a);color:#fff;display:grid;place-items:center}
+[dir=rtl] #x{right:auto;left:8px}
+#x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round}
+button:focus-visible,input:focus-visible,select:focus-visible,.k:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+</style></head><body>
+<header><div class="r"><label class="s"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="search" autocomplete="off"></label><select id="l" aria-label="language"></select></div><div id="c"></div></header>
+<main id="g"></main>
+<div id="o"><iframe id="f"></iframe><button id="x" aria-label="close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<script>
+const $=s=>document.querySelector(s);
+let D,L='th',Q='',K='';
+try{L=localStorage.getItem('sl')||'th'}catch(e){}
+const cp='<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+fetch('template.json').then(r=>r.json()).then(d=>{
+D=d;if(!d.langs.includes(L))L=d.default;
+d.templates.forEach(t=>{t.s=(Object.values(t.keywords).flat().join(' ')+' '+t.id+' '+t.file).toLowerCase()});
+const s=$('#l');d.langs.forEach(k=>s.add(new Option(d.ui.lang[k],k)));s.value=L;
+s.onchange=()=>{L=s.value;try{localStorage.setItem('sl',L)}catch(e){}draw()};
+$('#q').oninput=e=>{Q=e.target.value.trim().toLowerCase();grid()};
+$('#x').onclick=()=>{$('#o').classList.remove('on');$('#f').src='about:blank'};
+addEventListener('resize',fit);draw()});
+function draw(){
+document.documentElement.lang=L;document.documentElement.dir=L=='ar'?'rtl':'ltr';
+$('#q').placeholder=D.ui.search[L];
+const c=$('#c');c.innerHTML='';
+[['',D.ui.all[L]],...Object.keys(D.types).map(k=>[k,D.types[k][L]])].forEach(([k,n])=>{
+const b=document.createElement('button');b.textContent=n;b.className=k==K?'on':'';
+b.onclick=()=>{K=k;draw()};c.append(b)});
+grid()}
+function grid(){
+const g=$('#g');g.innerHTML='';
+D.templates.filter(t=>(!K||t.type==K)&&(!Q||t.s.includes(Q))).forEach(t=>{
+const e=document.createElement('div');e.className='k';e.tabIndex=0;
+e.innerHTML='<div class="p"><iframe src="'+t.file+'" loading="lazy" sandbox tabindex="-1"></iframe></div><div class="n"><b></b><button aria-label="copy">'+cp+'</button></div>';
+e.querySelector('b').textContent=t.name[L];
+const o=()=>{$('#f').src=t.file;$('#o').classList.add('on')};
+e.onclick=o;e.onkeydown=v=>{if(v.key=='Enter')o()};
+const b=e.querySelector('button');
+b.onclick=v=>{v.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(t.url);b.classList.add('ok');setTimeout(()=>b.classList.remove('ok'),1200)};
+g.append(e)});
+fit()}
+function fit(){document.querySelectorAll('.p').forEach(p=>{p.firstChild.style.transform='scale('+p.clientWidth/1000+')'})}
+</script></body></html>
